@@ -82,8 +82,11 @@ def SortBubble(prodList):
     for i in range(n-1):
         end = False;
         for j in range(0, n - i - 1):
+        #Compares each item with its adjacent item
             if prodList[j].get_category() < prodList[j + 1].get_category():
+            #Checks if the category of the current Stationary object is less than the category of the next Stationary object.
                 prodList[j], prodList[j + 1] = prodList[j + 1], prodList[j]
+                #Swaps the current Stationary object with the next one.
                 end = True
         print("Pass", i + 1)
         print("------------------------")
