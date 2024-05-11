@@ -1,0 +1,15 @@
+Low P = 0
+High P = 10
+Mid P = 5
+
+If lower, 
+
+Low P = 0
+High P = 4
+Mid P = 2
+
+If lower,
+
+Low P = 0
+High P = 1 
+Mid P = 0
