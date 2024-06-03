@@ -7,3 +7,4 @@ def my_func(x):
     var = 12
 
 my_func(10)
+print(var)

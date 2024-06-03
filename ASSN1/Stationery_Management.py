@@ -46,25 +46,47 @@ def populateData():
     print("Data has been populated!\n")
     return prodList
 
-
 def AddStationary(prodList):
     while True:
         prod_id = input("Enter Product ID: ")
+        while not prod_id:
+            print("Input cannot be empty.\n")
+            prod_id = input("Enter Product ID: ")
+
+        for stationary in prodList:
+            while stationary.get_prod_id() == prod_id:
+                print("Product ID already exists. Enter a unique ID.\n")
+                prod_id = input("Enter Product ID: ")
+
         prodname = input("Enter Product Name: ")
+        while not prodname:
+            print("Input cannot be empty.\n")
+            prodname = input("Enter Product Name: ")
+
         category = input("Enter Category: ")
+        while not category:
+            print("Input cannot be empty.\n")
+            category = input("Enter Category: ")
+
         brand = input("Enter Brand: ")
-        supp_year = input("Enter Supplier Year: ")
+        while not brand:
+            print("Input cannot be empty.\n")
+            brand = input("Enter Brand: ")
         
-        if prod_id and prodname and category and brand and supp_year:
+        supp_year = input("Enter Supplier Year: ")
+        while not supp_year:
+            print("Input cannot be empty.\n")
+            supp_year = input("Enter Supplier Year: ")
+
+        while not supp_year.isdigit():
+            print("Invalid input. Supplier Year must be a number.\n")
+            supp_year = input("Enter Supplier Year: ")
+
             newStudA = Stationary(prod_id, prodname, category, brand, supp_year)
             prodList.append(newStudA)
             print("Stationary added successfully!\n")
             break
-        else:
-            print("Invalid input. Please enter all fields.\n")
-    
-    return prodList.append(newStudA)
-
+            
 def DisplayStationary(prodList):
     if not prodList:
         print("No Stationary in the list!\n")
