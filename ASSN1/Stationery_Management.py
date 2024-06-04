@@ -48,15 +48,15 @@ def populateData():
 
 def AddStationary(prodList):
     while True:
-        prod_id = input("Enter Product ID: ")
+        prod_id = input("Enter Product ID: ").upper()
         while not prod_id:
             print("Input cannot be empty.\n")
-            prod_id = input("Enter Product ID: ")
+            prod_id = input("Enter Product ID: ").upper()
 
         for stationary in prodList:
             while stationary.get_prod_id() == prod_id:
                 print("Product ID already exists. Enter a unique ID.\n")
-                prod_id = input("Enter Product ID: ")
+                prod_id = input("Enter Product ID: ").upper()
 
         prodname = input("Enter Product Name: ")
         while not prodname:
@@ -78,14 +78,14 @@ def AddStationary(prodList):
             print("Input cannot be empty.\n")
             supp_year = input("Enter Supplier Year: ")
 
-        while not supp_year.isdigit():
-            print("Invalid input. Supplier Year must be a number.\n")
+        while not supp_year.isdigit() or int(supp_year) < 0 or len(supp_year) != 4:
+            print("Invalid input. Supplier Year must be a four-digit number.\n")
             supp_year = input("Enter Supplier Year: ")
 
-            newStudA = Stationary(prod_id, prodname, category, brand, supp_year)
-            prodList.append(newStudA)
-            print("Stationary added successfully!\n")
-            break
+        newStudA = Stationary(prod_id, prodname, category, brand, supp_year)
+        prodList.append(newStudA)
+        print("Stationary added successfully!\n")
+        break
             
 def DisplayStationary(prodList):
     if not prodList:
@@ -132,19 +132,28 @@ def SortBubble(prodList):
 
 def SortInsertion(prodList):
     n = len(prodList)
+
     for i in range(1, n):
-        key = prodList[i]
+        key = prodList[i]  
+        # Current element to be inserted at the correct position
         j = i - 1
+
+        # Move elements of prodList[0..i-1], that are greater than key, to one position ahead of their current position
         while j >= 0 and prodList[j].get_brand() > key.get_brand():
             prodList[j + 1] = prodList[j]
             j -= 1
-        prodList[j + 1] = key
+
+        prodList[j + 1] = key  
+        # Insert the key at its correct position in the sorted sublist
+
+        # Print the current pass and the list after each pass
         print("Pass", i)
         print("------------------------")
         for stationary in prodList:
             print("Product ID:", stationary.get_prod_id())
         print("------------------------")
-    
+
+    # Print the final sorted list
     print("Final Sorted Stationary:")
     print("------------------------")
     for stationary in prodList:
