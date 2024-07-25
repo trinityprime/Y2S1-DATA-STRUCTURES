@@ -1,5 +1,7 @@
 from Stationary import Stationary, Queue, RestockDetail
 
+queue = Queue()
+
 def main():
    prodList = []
    while (True):
@@ -44,9 +46,9 @@ def main():
 def RestockingMenu(prodList):
     while True:
         print("Restocking Menu:")
-        print("(1). Add Restock Details")
-        print("(2). View Restock Queue Size")
-        print("(3). Handle Next Delivery")
+        print("(1). Enter new stock arrival")
+        print("(2). View Number of stock arrival")
+        print("(3). Service next restock in queue")
         print("(0). Return to Main Menu")
         restock_input = input("Please enter your choice: ")
         print("------------------------")
@@ -56,7 +58,7 @@ def RestockingMenu(prodList):
         elif restock_input == "2":
             ViewQueueSize()
         elif restock_input == "3":
-            HandleNextDelivery(prodList)
+            HandleNextRestock(prodList)
         elif restock_input == "0":
             break
         else:
@@ -288,41 +290,58 @@ def DisplayRecordsPerRow(prodList, per_row=1):
 
 
 def AddRestock(prodList):
-    prod_id = input("Enter Product ID for restocking: ").upper()
-    quantity = int(input("Enter quantity: "))
-    for prod in prodList:
-        if prod.get_prod_id() == prod_id:
-            restock_detail = RestockDetail(prod_id, quantity)
-            Queue.enqueue(restock_detail)
-            print("Restock details added to queue.\n")
-            return
-    print("Product ID not found in the system.\n")
+    while True:
+        prod_id = input("Enter Product ID for restocking: ").upper()
+        for prod in prodList:
+            if prod.get_prod_id() == prod_id:
+                break
+        else:
+            print("Product ID not found in the system.\n")
+            prod_id = input("Enter Product ID for restocking: ").upper()
+
+        quantity = input("Enter quantity: ")
+        while not quantity.isdigit() or int(quantity) < 0:
+            print("Invalid input. Quantity must be a positive integer.\n")
+            quantity = input("Enter quantity: ")
+        quantity = int(quantity)
+
+        restock_detail = RestockDetail(prod_id, quantity)
+        queue.enqueue(restock_detail)
+        print("Restocking arrival queued successfully!\n")
+        break
 
 
 def ViewQueueSize():
-    print(f"Number of deliveries in queue: {Queue.size()}\n")
+    print(f"Number of restocking in queue: {queue.size()}\n")
 
 
-def HandleNextDelivery(prodList):
-    if Queue.is_empty():
-        print("No deliveries in queue.\n")
+def HandleNextRestock(prodList):
+    if queue.is_empty():
+        print("No restock in queue.\n")
         return
     
-    next_delivery = Queue.queue[0]
-    print(f"Next delivery: Product ID: {next_delivery.prod_id}, Quantity: {next_delivery.quantity}")
+
+    next_restock = queue.queue[0]
+    print(f"Display Pending stock arrival:\n")
+    print("----------------------------------")
+    print(f"Product ID: {next_restock.prod_id}\nQuantity: {next_restock.quantity}\nProduct Category: {next_restock.category}\nBrand: {next_restock.brand}\nSupplier Year: {next_restock.supp_year}\nStock remaining: {next_restock.stock}")
+    print("----------------------------------")
+
+    # print new stock 
+
     choice = input("Accept delivery? (y/n): ").lower()
     
     if choice == 'y':
         for prod in prodList:
-            if prod.get_prod_id() == next_delivery.prod_id:
-                prod.set_stock(prod.get_stock() + next_delivery.quantity)
-                print(f"Stock updated for {next_delivery.prod_id}. New stock: {prod.get_stock()}\n")
-                Queue.dequeue()
-                print(f"Remaining deliveries in queue: {Queue.size()}\n")
+            if prod.get_prod_id() == next_restock.prod_id:
+                prod.set_stock(prod.get_stock() + next_restock.quantity)
+                print(f"Stock updated for {next_restock.prod_id}. New stock: {prod.get_stock()}\n")
+                queue.dequeue()
+                print(f"Remaining restock in queue: {queue.size()}\n")
                 return
     
-    Queue.enqueue(Queue.dequeue())
-    print("Delivery sent to the back of the queue.\n")
+    queue.enqueue(queue.dequeue())
+    print("Restock sent to the back of the queue.\n")
 
 
 if __name__ == "__main__":
