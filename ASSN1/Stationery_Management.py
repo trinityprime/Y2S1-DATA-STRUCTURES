@@ -4,49 +4,64 @@ def main():
    prodList = []
    while (True):
                 
-                print("(1). Add a new Stationary")
-                print("(2). Display all Stationary")
-                print("(3). Sort Stationary via Bubble Sort on Category")
-                print("(4). Sort Stationary via Insertion sort on Brand")
-                print("(5). Sort Stationary via Selection Sort on Prod Id")
-                print("(6). Sort Stationary via Merge Sort on Category follow by stock in ascending order")
-                print("(7). Add Restock Details")
-                print("(8). View Restock Queue Size")
-                print("(9). Handle Next Delivery")
-                print("(10). Set number of records per row to display")
-                print("(11). Populate Data")
-                print("(0). Exit Program")
-                user_input = input("Please enter your choice: ")
-                print("------------------------")
+        print("(1). Add a new Stationary")
+        print("(2). Display all Stationary")
+        print("(3). Sort Stationary via Bubble Sort on Category")
+        print("(4). Sort Stationary via Insertion Sort on Brand")
+        print("(5). Sort Stationary via Selection Sort on Prod Id")
+        print("(6). Sort Stationary via Merge Sort on Category followed by stock in ascending order")
+        print("(7). Restocking Menu")
+        print("(8). Set number of records per row to display")
+        print("(9). Populate Data")
+        print("(0). Exit Program")
+        user_input = input("Please enter your choice: ")
+        print("------------------------")
 
-                if user_input == "1":
-                    AddStationary(prodList)
-                elif user_input == "2":
-                    DisplayStationary(prodList)
-                elif user_input == "3":
-                    SortBubble(prodList)
-                elif user_input == "4":
-                    SortInsertion(prodList)
-                elif user_input == "5":
-                    SortSelection(prodList)
-                elif user_input == "6":
-                    SortMerge(prodList)
-                elif user_input == "7":
-                    AddRestock(prodList)
-                elif user_input == "8":
-                    ViewQueueSize()
-                elif user_input == "9":
-                    HandleNextDelivery(prodList)
-                elif user_input == "10":
-                    per_row = int(input("Enter number of records per row: "))
-                    DisplayRecordsPerRow(prodList, per_row)
-                elif user_input == "11":
-                    prodList = populateData()
-                elif user_input.lower() == "0":
-                    exit()
-                else:
-                    print("Invalid input.")
-    
+        if user_input == "1":
+            AddStationary(prodList)
+        elif user_input == "2":
+            DisplayStationary(prodList)
+        elif user_input == "3":
+            SortBubble(prodList)
+        elif user_input == "4":
+            SortInsertion(prodList)
+        elif user_input == "5":
+            SortSelection(prodList)
+        elif user_input == "6":
+            SortMerge(prodList)
+        elif user_input == "7":
+            RestockingMenu(prodList)
+        elif user_input == "8":
+            per_row = int(input("Enter number of records per row: "))
+            DisplayRecordsPerRow(prodList, per_row)
+        elif user_input == "9":
+            prodList = populateData()
+        elif user_input.lower() == "0":
+            exit()
+        else:
+            print("Invalid input.")
+
+def RestockingMenu(prodList):
+    while True:
+        print("Restocking Menu:")
+        print("(1). Add Restock Details")
+        print("(2). View Restock Queue Size")
+        print("(3). Handle Next Delivery")
+        print("(0). Return to Main Menu")
+        restock_input = input("Please enter your choice: ")
+        print("------------------------")
+
+        if restock_input == "1":
+            AddRestock(prodList)
+        elif restock_input == "2":
+            ViewQueueSize()
+        elif restock_input == "3":
+            HandleNextDelivery(prodList)
+        elif restock_input == "0":
+            break
+        else:
+            print("Invalid input.")
+
 def populateData():
     prodList = []
     newStudA = Stationary(prod_id="PD1020", prodname="Pastel Art Paper", category="Paper", brand="Faber-Castell", supp_year=2021, stock=2000)
@@ -201,10 +216,14 @@ def SortSelection(prodList):
             if prodList[j].get_prod_id() > prodList[max_idx].get_prod_id():
                 max_idx = j
         prodList[i], prodList[max_idx] = prodList[max_idx], prodList[i]
-        print([p.get_prod_id() for p in prodList])  
-    print("Final sorted list (Descending Prod_id):")
+        print(f"Pass {i + 1}:")
+        print(f"------------------")
+        for p in prodList:
+            print(p.get_prod_id())
+        print(f"------------------")
+
     for stationary in prodList:
-        print(stationary.get_prod_id(), stationary.get_prodname(), stationary.get_category(), stationary.get_brand(), stationary.get_supp_year(), stationary.get_stock())
+        print(f"Prod id: {stationary.get_prod_id()}\nProd Name: {stationary.get_prodname()}\nCategory: {stationary.get_category()}\nBrand: {stationary.get_brand()}\nSupplier Since: {stationary.get_supp_year()}\nStocks: {stationary.get_stock()} \n")
 
 
 def SortMerge(stationery_list):
@@ -238,12 +257,17 @@ def SortMerge(stationery_list):
                 j += 1
                 k += 1
 
-            print([stationery.get_prod_id() for stationery in arr])  # Display Prod_id in each pass
+            print("New List:")
+            print("---------------------")
+            for stationery in arr:
+                print(stationery.get_prod_id())
+            print("---------------------") 
 
     merge_sort(stationery_list, key=lambda x: (x.get_category(), x.get_stock()))
-    print("Final sorted list (Ascending by Category and Stock):")
+
+
     for stationary in stationery_list:
-        print(stationary.get_prod_id(), stationary.get_prodname(), stationary.get_category(), stationary.get_brand(), stationary.get_supp_year(), stationary.get_stock())
+        print(f"Prod id: {stationary.get_prod_id()}\nProd Name: {stationary.get_prodname()}\nCategory: {stationary.get_category()}\nBrand: {stationary.get_brand()}\nSupplier Since: {stationary.get_supp_year()}\nStock: {stationary.get_stock()} \n")
 
 
 def DisplayRecordsPerRow(prodList, per_row=1):
