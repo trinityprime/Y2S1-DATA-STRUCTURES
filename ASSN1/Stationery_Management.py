@@ -3,6 +3,8 @@ from Stationary import Stationary, Queue, RestockDetail
 queue = Queue()
 
 def main():
+   # per row stored as global var
+   per_row = 1
    prodList = []
    while (True):
                 
@@ -22,20 +24,19 @@ def main():
         if user_input == "1":
             AddStationary(prodList)
         elif user_input == "2":
-            DisplayStationary(prodList)
+            DisplayStationary(prodList, per_row)
         elif user_input == "3":
             SortBubble(prodList)
         elif user_input == "4":
             SortInsertion(prodList)
         elif user_input == "5":
-            SortSelection(prodList)
+            SortSelection(prodList, per_row)
         elif user_input == "6":
-            SortMerge(prodList)
+            SortMerge(prodList, per_row)
         elif user_input == "7":
             RestockingMenu(prodList)
         elif user_input == "8":
             per_row = int(input("Enter number of records per row: "))
-            DisplayRecordsPerRow(prodList, per_row)
         elif user_input == "9":
             prodList = populateData()
         elif user_input.lower() == "0":
@@ -131,18 +132,11 @@ def AddStationary(prodList):
         print("Stationary added successfully!\n")
         break
             
-def DisplayStationary(prodList):
+def DisplayStationary(prodList, per_row):
     if not prodList:
         print("No Stationary in the list!\n")
     else:
-        for i in prodList:
-            print("Product ID: ", i.get_prod_id())
-            print("Product Name: ", i.get_prodname())
-            print("Category: ", i.get_category())
-            print("Brand: ", i.get_brand())
-            print("Supplier Year: ", i.get_supp_year())
-            print("Stock: ", i.get_stock())
-            print("------------------------")
+        DisplayRecordsPerRow(prodList, per_row)
 
 
 def SortBubble(prodList):
@@ -210,7 +204,7 @@ def SortInsertion(prodList):
         print("------------------------")
 
 
-def SortSelection(prodList):
+def SortSelection(prodList, per_row):
     n = len(prodList)
     for i in range(n):
         max_idx = i
@@ -220,15 +214,11 @@ def SortSelection(prodList):
         prodList[i], prodList[max_idx] = prodList[max_idx], prodList[i]
         print(f"Pass {i + 1}:")
         print(f"------------------")
-        for p in prodList:
-            print(p.get_prod_id())
+        DisplayRecordsPerRow(prodList, per_row)
         print(f"------------------")
 
-    for stationary in prodList:
-        print(f"Prod id: {stationary.get_prod_id()}\nProd Name: {stationary.get_prodname()}\nCategory: {stationary.get_category()}\nBrand: {stationary.get_brand()}\nSupplier Since: {stationary.get_supp_year()}\nStocks: {stationary.get_stock()} \n")
 
-
-def SortMerge(stationery_list):
+def SortMerge(stationery_list, per_row):
     def merge_sort(arr, key=lambda x: x):
         if len(arr) > 1:
             mid = len(arr) // 2
@@ -261,32 +251,39 @@ def SortMerge(stationery_list):
 
             print("New List:")
             print("---------------------")
-            for stationery in arr:
-                print(stationery.get_prod_id())
+            DisplayRecordsPerRow(arr, per_row)
             print("---------------------") 
 
     merge_sort(stationery_list, key=lambda x: (x.get_category(), x.get_stock()))
 
-
-    for stationary in stationery_list:
-        print(f"Prod id: {stationary.get_prod_id()}\nProd Name: {stationary.get_prodname()}\nCategory: {stationary.get_category()}\nBrand: {stationary.get_brand()}\nSupplier Since: {stationary.get_supp_year()}\nStock: {stationary.get_stock()} \n")
+    DisplayRecordsPerRow(stationery_list, per_row)
 
 
 def DisplayRecordsPerRow(prodList, per_row=1):
-    def recursive_display(index):
-        if index >= len(prodList):
-            return
-        print(f"Product ID: {prodList[index].get_prod_id()}")
-        print(f"Product Name: {prodList[index].get_prodname()}")
-        print(f"Category: {prodList[index].get_category()}")
-        print(f"Brand: {prodList[index].get_brand()}")
-        print(f"Supplier Year: {prodList[index].get_supp_year()}")
-        print(f"Stock: {prodList[index].get_stock()}\n")
-        if (index + 1) % per_row == 0:
-            input("Press Enter to continue...")
-        recursive_display(index + 1)
+    # Define labels and consistent widths for alignment
+    labels = {
+        'get_prod_id': ("Prod id", 45),        
+        'get_prodname': ("Prod Name", 45),     
+        'get_category': ("Category", 45),      
+        'get_brand': ("Brand", 45),            
+        'get_supp_year': ("Supplier Since", 45), 
+        'get_stock': ("Stocks", 45)           
+    }
+    
+    total_items = len(prodList)
+    for start in range(0, total_items, per_row):
+        end = min(start + per_row, total_items)
+        
+        for attribute, (label, width) in labels.items():
+            for index in range(start, end):
+                item = prodList[index]
+                value = getattr(item, attribute)() if callable(getattr(item, attribute, None)) else ''
+                # Print the label and value with consistent padding
+                print(f"{label}: {value}".ljust(width), end=' ')
+            print()  
+        print()
+        print()
 
-    recursive_display(0)
 
 
 def AddRestock(prodList):
@@ -319,30 +316,43 @@ def HandleNextRestock(prodList):
     if queue.is_empty():
         print("No restock in queue.\n")
         return
-    
 
     next_restock = queue.queue[0]
-    print(f"Display Pending stock arrival:\n")
-    print("----------------------------------")
-    print(f"Product ID: {next_restock.prod_id}\nQuantity: {next_restock.quantity}\nProduct Category: {next_restock.category}\nBrand: {next_restock.brand}\nSupplier Year: {next_restock.supp_year}\nStock remaining: {next_restock.stock}")
-    print("----------------------------------")
+    restock_prod_id = next_restock.prod_id
+    restock_quantity = next_restock.quantity
 
-    # print new stock 
+    # Find the corresponding stationary product details
+    stationary_item = None
+    for prod in prodList:
+        if prod.get_prod_id() == restock_prod_id:
+            stationary_item = prod
+            break
 
+    if stationary_item is None:
+        print(f"Product ID {restock_prod_id} not found in inventory.\n")
+        return
+
+    print("Display Pending Stock Arrival:")
+    print("----------------------------------")
+    print(f"Product ID: {restock_prod_id}")
+    print(f"Product Category: {stationary_item.get_category()}")
+    print(f"Brand: {stationary_item.get_brand()}")
+    print(f"Supplier Year: {stationary_item.get_supp_year()}")
+    print(f"Stock remaining: {stationary_item.get_stock()}")
+    print("----------------------------------")
+    print(f"New Stock: {restock_quantity}")
+    print("-----------------------------------")
+    
     choice = input("Accept delivery? (y/n): ").lower()
     
     if choice == 'y':
-        for prod in prodList:
-            if prod.get_prod_id() == next_restock.prod_id:
-                prod.set_stock(prod.get_stock() + next_restock.quantity)
-                print(f"Stock updated for {next_restock.prod_id}. New stock: {prod.get_stock()}\n")
-                queue.dequeue()
-                print(f"Remaining restock in queue: {queue.size()}\n")
-                return
-    
-    queue.enqueue(queue.dequeue())
-    print("Restock sent to the back of the queue.\n")
-
+        stationary_item.set_stock(stationary_item.get_stock() + restock_quantity)
+        print(f"Stock updated for {stationary_item.get_prod_id()}. Updated stock: {stationary_item.get_stock()}\n")
+        queue.dequeue()
+        print(f"Remaining restock in queue: {queue.size()}\n")
+    else:
+        queue.enqueue(queue.dequeue())  # Send to the back of the queue
+        print("Restock sent to the back of the queue.\n")
 
 if __name__ == "__main__":
      main()
